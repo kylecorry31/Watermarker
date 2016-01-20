@@ -7,6 +7,9 @@ def show_image(image):
     plt.imshow(image)
     plt.show()
     
+def convert_to_black_and_white(image):
+    return image.convert('LA')
+    
 def add_logo(image, logo, corner):
     (width, height) = logo.size
     logo_max = max([height, width])
@@ -30,13 +33,15 @@ def add_logo(image, logo, corner):
         padding = tuple(map(lambda x: int(x), [0.05 * image.size[0], 0.05 * image.size[1]]))
     else:
         padding = tuple(map(lambda x: int(x), [image.size[0] - width - 0.05 * image.size[0], 0.05 * image.size[1]]))
-    return image.paste(logo, padding, mask=logo)
+    image.paste(logo, padding, mask=logo)
+    return image
 
 def manipulate_image(image):
     current_image = PIL.Image.open(os.getcwd() + '\\' + image)
     current_image = current_image.convert("RGBA")
     logo = PIL.Image.open(os.getcwd() + "\\" + raw_input("What is the logo file name?\n"))
     corner = int(raw_input("Location of the logo bottom left (0), buttom right (1), top left (2), top right (3)\n"))
+    current_image = convert_to_black_and_white(current_image)
     current_image = add_logo(current_image, logo, corner)
     show_image(current_image)
 
