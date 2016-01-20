@@ -6,25 +6,38 @@ import matplotlib.pyplot as plt
 def show_image(image):
     plt.imshow(image)
     plt.show()
+    
+def add_logo(image, logo, corner):
+    (width, height) = logo.size
+    logo_max = max([height, width])
+    logo_aspect_ratio = height / float(width)
+    if logo_max == height:
+        height = int(0.25 * image.size[1])
+        width = int(height / logo_aspect_ratio)
+        logo = logo.resize((width, height))
+    else:
+        width = int(0.25 * image.size[0])
+        height = int(width *  logo_aspect_ratio)
+        logo = logo.resize((width, height))
+    btm_left = 0
+    btm_right = 1
+    top_left = 2
+    if corner == btm_left:
+        padding = tuple(map(lambda x: int(x), [0.05 * image.size[0], image.size[1] - height - 0.05 * image.size[1]]))
+    elif corner == btm_right:
+        padding = tuple(map(lambda x: int(x), [image.size[0] - width - 0.05 * image.size[0], image.size[1] - height - 0.05 * image.size[1]]))
+    elif corner == top_left:
+        padding = tuple(map(lambda x: int(x), [0.05 * image.size[0], 0.05 * image.size[1]]))
+    else:
+        padding = tuple(map(lambda x: int(x), [image.size[0] - width - 0.05 * image.size[0], 0.05 * image.size[1]]))
+    return image.paste(logo, padding, mask=logo)
 
 def manipulate_image(image):
     current_image = PIL.Image.open(os.getcwd() + '\\' + image)
     current_image = current_image.convert("RGBA")
     logo = PIL.Image.open(os.getcwd() + "\\" + raw_input("What is the logo file name?\n"))
-    logo_position = [0, 0]
-    logo_position[0] = int(raw_input("X location of the logo\n"))
-    logo_position[1] = int(raw_input("Y location of the logo\n"))
-    logo_max = max([logo.height, logo.width])
-    logo_aspect_ratio = logo.height / float(logo.width)
-    if logo_max == logo.height:
-        height = int(0.25 * current_image.height)
-        width = int(height / logo_aspect_ratio)
-        logo.resize((width, height))
-    else:
-        width = int(0.25 * current_image.width)
-        height = int(width *  logo_aspect_ratio)
-        logo.resize((width, height))
-    current_image.paste(logo, tuple(logo_position), mask=logo)
+    corner = int(raw_input("Location of the logo bottom left (0), buttom right (1), top left (2), top right (3)\n"))
+    current_image = add_logo(current_image, logo, corner)
     show_image(current_image)
 
 def combine_images(images):
