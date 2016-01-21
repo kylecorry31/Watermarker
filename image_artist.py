@@ -1,5 +1,6 @@
 import os
 import PIL
+import PIL.ImageDraw
 import matplotlib.pyplot as plt
 
 
@@ -59,7 +60,7 @@ def add_border(image, size, brand_primary_color, brand_secondary_color):
     image = frame_image(image, brand_primary_color, size)
     return image
 
-def manipulate_image(current_image, corner, gray):
+def manipulate_image(current_image, current_filename, corner, gray):
     #current_image = PIL.Image.open(os.getcwd() + '/' + image)
     current_image = current_image.convert("RGBA")
     logo = PIL.Image.open(os.path.join(os.getcwd(), 'logo.png'))
@@ -67,8 +68,8 @@ def manipulate_image(current_image, corner, gray):
         current_image = convert_to_black_and_white(current_image)
     current_image = current_image.convert("RGBA")
     current_image = add_logo(current_image, logo, corner)
-    # current_image = add_border(current_image, 0.05 * current_image.size[0], (10, 10, 10), (0, 0, 0))
-    show_image(current_image)
+    current_image = add_border(current_image, 0.05 * current_image.size[0], (10, 10, 10), (0, 0, 0))
+    current_image.save(os.path.join(os.getcwd(), 'modified', current_filename))
 
 
 def get_images(directory=None):
@@ -84,7 +85,11 @@ def get_images(directory=None):
         directory = os.path.join(os.getcwd(), "Images") # Use working directory if unspecified
     image_list = [] # Initialize aggregaotrs
     file_list = []
-    
+    new_directory = os.path.join(directory, 'modified')
+    try:
+        os.mkdir(new_directory)
+    except OSError:
+        pass # if the directory already exists, proceed 
     directory_list = os.listdir(directory) # Get list of files
     for entry in directory_list:
         absolute_filename = os.path.join(directory, entry)
@@ -98,10 +103,10 @@ def get_images(directory=None):
 
 def main():
     images = get_images()
-    corner = int(raw_input("Location of the logo: bottom left (0), buttom right (1), top left (2), top right (3)\n"))
+    corner = int(raw_input("Location of the logo: bottom left (0), bottom right (1), top left (2), top right (3)\n"))
     gray = bool(int(raw_input("Make image grayscale? (1 = yes, 0 = no)\n")))
-    for image in images[0]:
-        manipulate_image(image, corner, gray)
+    for n in range(len(images[0])):
+        manipulate_image(images[0][n], images[1][n], corner, gray)
         
 if __name__ == "__main__":
     main()
