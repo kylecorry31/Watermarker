@@ -32,7 +32,12 @@ def add_logo(image, logo, corner):
         padding = tuple(map(lambda x: int(x), [image.size[0] - width - percent * image.size[0], percent * image.size[1]]))
     image.paste(logo, padding, mask=logo)
     return image
-
+    
+def add_triangle_corners(original_image, color, wide):
+    draw = PIL.ImageDraw.Draw(original_image)
+    draw.polygon([(0, 0), (0, wide), (wide, 0)], fill=(0, 0, 0))
+    return original_image    
+    
 def frame_image(original_image, color, wide):
     """ Frames a PIL.Image
     
@@ -52,8 +57,8 @@ def frame_image(original_image, color, wide):
     result.paste(original_image, (0,0), mask=border_mask)
     return result
 
-def add_border(image, size, brand_primary_color, brand_secondary_color):
-    image = frame_image(image, brand_primary_color, size)
+def add_border(image, size, color):
+    image = frame_image(image, color, size)
     return image
 
 def manipulate_image(current_image, current_filename, corner, gray):
@@ -64,7 +69,8 @@ def manipulate_image(current_image, current_filename, corner, gray):
         current_image = convert_to_grayscale(current_image)
     current_image = current_image.convert("RGBA")
     current_image = add_logo(current_image, logo, corner)
-    current_image = add_border(current_image, 0.05 * current_image.size[0], (255, 255, 255), (0, 0, 0))
+    current_image = add_border(current_image, 0.05 * current_image.size[0], (255, 255, 255))
+    current_image = add_triangle_corners(current_image, 0.05 * current_image.size[0], (0, 0, 0))
     current_image.save(os.path.join(os.getcwd(), 'modified', current_filename), 'JPEG')
 
 
