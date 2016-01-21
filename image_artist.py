@@ -2,13 +2,8 @@ import os
 import PIL
 import PIL.ImageDraw
 import matplotlib.pyplot as plt
-
-
-def show_image(image):
-    plt.imshow(image)
-    plt.show()
     
-def convert_to_black_and_white(image):
+def convert_to_grayscale(image):
     return image.convert('LA')
     
 def add_logo(image, logo, corner):
@@ -16,29 +11,30 @@ def add_logo(image, logo, corner):
     logo_max = max([height, width])
     logo_aspect_ratio = height / float(width)
     if logo_max == height:
-        height = int(0.25 * image.size[1])
+        height = int(0.22 * image.size[1])
         width = int(height / logo_aspect_ratio)
         logo = logo.resize((width, height))
     else:
-        width = int(0.25 * image.size[0])
+        width = int(0.22 * image.size[0])
         height = int(width *  logo_aspect_ratio)
         logo = logo.resize((width, height))
     btm_left = 0
     btm_right = 1
     top_left = 2
+    percent = 0.08
     if corner == btm_left:
-        padding = tuple(map(lambda x: int(x), [0.05 * image.size[0], image.size[1] - height - 0.05 * image.size[1]]))
+        padding = tuple(map(lambda x: int(x), [percent * image.size[0], image.size[1] - height - percent * image.size[1]]))
     elif corner == btm_right:
-        padding = tuple(map(lambda x: int(x), [image.size[0] - width - 0.05 * image.size[0], image.size[1] - height - 0.05 * image.size[1]]))
+        padding = tuple(map(lambda x: int(x), [image.size[0] - width - percent * image.size[0], image.size[1] - height - percent * image.size[1]]))
     elif corner == top_left:
-        padding = tuple(map(lambda x: int(x), [0.05 * image.size[0], 0.05 * image.size[1]]))
+        padding = tuple(map(lambda x: int(x), [percent * image.size[0], percent * image.size[0]]))
     else:
-        padding = tuple(map(lambda x: int(x), [image.size[0] - width - 0.05 * image.size[0], 0.05 * image.size[1]]))
+        padding = tuple(map(lambda x: int(x), [image.size[0] - width - percent * image.size[0], percent * image.size[1]]))
     image.paste(logo, padding, mask=logo)
     return image
 
 def frame_image(original_image, color, wide):
-    """ Rounds the corner of a PIL.Image
+    """ Frames a PIL.Image
     
     original_image must be a PIL.Image
     color: The color of the border as a 3-tuple of RGB color (R, G, B)
@@ -65,11 +61,11 @@ def manipulate_image(current_image, current_filename, corner, gray):
     current_image = current_image.convert("RGBA")
     logo = PIL.Image.open(os.path.join(os.getcwd(), 'logo.png'))
     if gray:
-        current_image = convert_to_black_and_white(current_image)
+        current_image = convert_to_grayscale(current_image)
     current_image = current_image.convert("RGBA")
     current_image = add_logo(current_image, logo, corner)
-    current_image = add_border(current_image, 0.05 * current_image.size[0], (10, 10, 10), (0, 0, 0))
-    current_image.save(os.path.join(os.getcwd(), 'modified', current_filename))
+    current_image = add_border(current_image, 0.05 * current_image.size[0], (255, 255, 255), (0, 0, 0))
+    current_image.save(os.path.join(os.getcwd(), 'modified', current_filename), 'JPEG')
 
 
 def get_images(directory=None):
@@ -85,7 +81,7 @@ def get_images(directory=None):
         directory = os.path.join(os.getcwd(), "Images") # Use working directory if unspecified
     image_list = [] # Initialize aggregaotrs
     file_list = []
-    new_directory = os.path.join(directory, 'modified')
+    new_directory = os.path.join(os.getcwd(), 'modified')
     try:
         os.mkdir(new_directory)
     except OSError:
