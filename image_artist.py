@@ -59,15 +59,15 @@ def add_border(image, size, brand_primary_color, brand_secondary_color):
     image = frame_image(image, brand_primary_color, size)
     return image
 
-def manipulate_image(current_image):
+def manipulate_image(current_image, corner, gray):
     #current_image = PIL.Image.open(os.getcwd() + '/' + image)
     current_image = current_image.convert("RGBA")
     logo = PIL.Image.open(os.path.join(os.getcwd(), 'logo.png'))
-    # corner = int(raw_input("Location of the logo bottom left (0), buttom right (1), top left (2), top right (3)\n"))
-    current_image = convert_to_black_and_white(current_image)
+    if gray:
+        current_image = convert_to_black_and_white(current_image)
     current_image = current_image.convert("RGBA")
-    current_image = add_logo(current_image, logo, 1)
-    # current_image = add_border(current_image, 0.05 * current_image.size[0], (11, 117, 43), (0, 152, 18))
+    current_image = add_logo(current_image, logo, corner)
+    # current_image = add_border(current_image, 0.05 * current_image.size[0], (10, 10, 10), (0, 0, 0))
     show_image(current_image)
 
 
@@ -98,8 +98,10 @@ def get_images(directory=None):
 
 def main():
     images = get_images()
+    corner = int(raw_input("Location of the logo: bottom left (0), buttom right (1), top left (2), top right (3)\n"))
+    gray = bool(int(raw_input("Make image grayscale? (1 = yes, 0 = no)\n")))
     for image in images[0]:
-        manipulate_image(image)
+        manipulate_image(image, corner, gray)
         
 if __name__ == "__main__":
     main()
