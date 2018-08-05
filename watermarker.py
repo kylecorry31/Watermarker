@@ -26,11 +26,11 @@ class AutoInvert(ShouldInvertAlgorithm):
         # TODO: See why this doesn't work as well
         # luminance1 = (l1 + 0.05) / 0.05
         # luminance2 = 1.05 / (l1 + 0.05)
-        # if min([luminance1, luminance2]) >= 7:
+        # if min([luminance1, luminance2]) >= 14:
         #     return luminance1 <= luminance2
-        # elif luminance1 >= 7:
+        # elif luminance1 >= 14:
         #     return False
-        # elif luminance2 >= 7:
+        # elif luminance2 >= 14:
         #     return True
         # else:
         #     return l1 <= 0.5
@@ -156,7 +156,10 @@ def main(input_dir, output_dir, watermark, corner, resize_amt, inverted):
         current_filename = images[1][n]
         print "Processing image:", current_filename, "(" + str(n + 1) + "/" + str(len(images[0]))+ ")"
         current_image = manipulate_image(current_image, watermarker, corner, resize_amt)
-        current_image.save(os.path.join(output_dir, current_filename), 'JPEG')
+        try:
+            current_image.save(os.path.join(output_dir, current_filename), 'JPEG')
+        except Exception as e:
+            print "Could not write image:", current_filename
 
 
 if __name__ == "__main__":
