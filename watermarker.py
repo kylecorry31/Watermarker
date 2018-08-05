@@ -4,7 +4,6 @@ import PIL
 import PIL.ImageDraw
 import PIL.ImageOps
 import PIL.ImageStat
-import matplotlib.pyplot as plt
 import argparse
 
 watermark = ""
