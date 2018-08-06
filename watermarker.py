@@ -139,6 +139,22 @@ def invert_rgba(image):
     r, g, b = map(lambda i: i.point(lambda p: 255 - p), (r, g, b))
     return PIL.Image.merge(image.mode, (r, g, b, a))
 
+def set_opacity(image, alpha):
+    """ Sets the opacity of an image.
+
+    image: (PIL.Image) The image to set the opacity of.
+
+    alpha: (float) The opacity alpha from 0 to 1 inclusive.
+
+    Returns the image with the opacity applied.
+    """
+    alpha_image = image.convert("RGBA")
+
+    r, g, b, a = image.split()
+    a = a.point(lambda p: int(255 * alpha) if p else 0)
+    return PIL.Image.merge(image.mode, (r, g, b, a))
+
+
 def get_images(directory=None):
     """ Returns PIL.Image objects for all the images in directory.
 
@@ -204,6 +220,7 @@ def main(input_dir, output_dir, watermark, corner, resize_amt, inverted):
 
     images = get_images(input_dir)
     logo = PIL.Image.open(watermark).convert("RGBA")
+    # logo = set_opacity(logo, 0.5)
 
     inverter = AutoInvert()
 
