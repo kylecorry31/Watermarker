@@ -101,10 +101,10 @@ def invert_rgba(image):
 def get_images(directory=None):
     """ Returns PIL.Image objects for all the images in directory.
 
-    If directory is not specified, uses current directory.
+    If directory is not specified, it will return a tuple of empty lists.
     Returns a 2-tuple containing
-    a list with a  PIL.Image object for each image file in root_directory, and
-    a list with a string filename for each image file in root_directory
+    a list with a  PIL.Image object for each image file in the directory, and
+    a list with a string filename for each image file in the directory
     """
     if directory == None:
         return [], []
@@ -123,6 +123,18 @@ def get_images(directory=None):
 
 
 def manipulate_image(current_image, watermarker, corner, resize_amt):
+    """Manipulates a single image, resizing it and adding a watermark.
+
+    current_image: (PIL.Image) The image to manipulate as a PIL.Image.
+
+    watermarker: (Watermarker) The watermarker, which will add a watermark to an image.
+
+    corner: (str) The location of the watermark on the image. Either top_left, top_right, bottom_left, bottom_right, or bottom_center.
+
+    resize_amt: (float) The amount to scale the image to, as a percent.
+
+    Returns the modified image.
+    """
     current_image = resize_image(current_image, resize_amt)
     current_image = watermarker.add_watermark(current_image, corner)
     return current_image
