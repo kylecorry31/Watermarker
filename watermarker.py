@@ -138,6 +138,8 @@ class Watermarker(object):
             padding = tuple(map(lambda x: int(x), [border_padding * image.size[0], border_padding * image.size[0]]))
         elif location == "top-right":
             padding = tuple(map(lambda x: int(x), [image.size[0] - width - border_padding * image.size[0], border_padding * image.size[1]]))
+        elif location == "center":
+            padding = tuple(map(lambda x: int(x), [image.size[0]/2 - width/2, image.size[1]/2 - height/2]))
         else:
             padding = tuple(map(lambda x: int(x), [image.size[0]/2 - width/2, image.size[1] - height - border_padding * image.size[1]]))
         needs_invert = self.inverter.should_invert(image, [padding, (padding[0] + width, padding[1] + height)])
@@ -267,7 +269,7 @@ def manipulate_image(current_image, watermarker, corner, resize_amt):
 
     watermarker: (Watermarker) The watermarker, which will add a watermark to an image.
 
-    corner: (str) The location of the watermark on the image. Either auto, top_left, top_right, bottom_left, bottom_right, or bottom_center.
+    corner: (str) The location of the watermark on the image. Either auto, center, top_left, top_right, bottom_left, bottom_right, or bottom_center.
 
     resize_amt: (float) The amount to scale the image to, as a percent.
 
@@ -286,7 +288,7 @@ def main(input_dir, output_dir, watermark, corner, resize_amt, inverted, opacity
 
         watermark: (str) The path of the watermark file.
 
-        corner: (str) The location of the watermark on the image. Either top_left, top_right, bottom_left, bottom_right, or bottom_center.
+        corner: (str) The location of the watermark on the image. Either auto, center, top_left, top_right, bottom_left, bottom_right, or bottom_center.
 
         resize_amt: (float) The amount to scale the image to, as a percent.
 
@@ -335,7 +337,7 @@ if __name__ == "__main__":
     parser.add_argument("watermark", help="The watermark to put on images.", type=str)
     parser.add_argument("--resize", "-r", help="The percent to scale the image to.", type=float, default=100)
     parser.add_argument("--location", "-l", help="The location of the watermark. Defaults to auto.", type=str,
-                        choices=["top-left", "top-right", "bottom-left", "bottom-right", "bottom-center", "auto"], default="auto")
+                        choices=["top-left", "top-right", "bottom-left", "bottom-right", "bottom-center", "center", "auto"], default="auto")
     parser.add_argument("--inverted", "-i", help="Choose whether the watermark is inverted. Defaults to auto.", type=str,
                         choices=["inverted", "not-inverted", "auto"], default="auto")
     parser.add_argument("--opacity", "-o", help="Sets the opacity alpha of the watermark, between 0 and 1 inclusive. Defaults to no change.", type=float, default=None)
