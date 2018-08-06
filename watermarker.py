@@ -228,7 +228,7 @@ def manipulate_image(current_image, watermarker, corner, resize_amt):
     current_image = watermarker.add_watermark(current_image, corner)
     return current_image
 
-def main(input_dir, output_dir, watermark, corner, resize_amt, inverted):
+def main(input_dir, output_dir, watermark, corner, resize_amt, inverted, opacity):
     """ The main function of the program, doing what the program is specified to do.
 
         input_dir: (str) The input directory, containing images.
@@ -242,6 +242,8 @@ def main(input_dir, output_dir, watermark, corner, resize_amt, inverted):
         resize_amt: (float) The amount to scale the image to, as a percent.
 
         inverted: (str) The inversion algorithm as a str. Either auto, inverted, or not-inverted.
+
+        opacity: (float) The opacity alpha of the watermark, None means no change.
     """
 
     # Create output directory
@@ -252,7 +254,8 @@ def main(input_dir, output_dir, watermark, corner, resize_amt, inverted):
 
     images = get_images(input_dir)
     logo = PIL.Image.open(watermark).convert("RGBA")
-    # logo = set_opacity(logo, 0.5)
+    if opacity is not None:
+        logo = set_opacity(logo, min(1, max(0, opacity)))
 
     inverter = AutoInvert()
 
@@ -286,6 +289,7 @@ if __name__ == "__main__":
                         choices=["top-left", "top-right", "bottom-left", "bottom-right", "bottom-center"], default="bottom-center")
     parser.add_argument("--inverted", "-i", help="Choose whether the watermark is inverted. Defaults to auto.", type=str,
                         choices=["inverted", "not-inverted", "auto"], default="auto")
+    parser.add_argument("--opacity", "-o", help="Sets the opacity alpha of the watermark, between 0 and 1 inclusive. Defaults to no change.", type=float, default=None)
     args = parser.parse_args()
 
-    main(args.input, args.output, args.watermark, args.location, args.resize, args.inverted)
+    main(args.input, args.output, args.watermark, args.location, args.resize, args.inverted, args.opacity)
