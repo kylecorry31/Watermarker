@@ -150,9 +150,9 @@ def set_opacity(image, alpha):
     """
     alpha_image = image.convert("RGBA")
 
-    r, g, b, a = image.split()
+    r, g, b, a = alpha_image.split()
     a = a.point(lambda p: int(255 * alpha) if p else 0)
-    return PIL.Image.merge(image.mode, (r, g, b, a))
+    return PIL.Image.merge(alpha_image.mode, (r, g, b, a))
 
 
 def get_images(directory=None):
