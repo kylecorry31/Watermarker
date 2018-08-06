@@ -20,7 +20,7 @@ class NeverInvert(ShouldInvertAlgorithm):
 
 class AutoInvert(ShouldInvertAlgorithm):
     def should_invert(self, image, region):
-        l1 = self.__get_luminance(image, region)[0] / 255.0
+        l1 = self.__get_luminance(image, region) / 255.0
 
         return l1 <= 0.5
         # TODO: See why this doesn't work as well
@@ -36,22 +36,49 @@ class AutoInvert(ShouldInvertAlgorithm):
         #     return l1 <= 0.5
 
     def __get_luminance(self, image, region):
+        """ Get the average luminance of the region.
+
+        image: (PIL.Image) The image to get the luminance of.
+
+        region: (array) The region to get the luminance of, in the form [(x0, y0), (x1, y1)] or [x0, y0, x1, y1]
+
+        Returns the average luminance of the region. (float)
+        """
         image_l = image.convert("L")
         (width, height) = image_l.size
         mask = PIL.Image.new('L', (width, height), 0)
         drawing_layer = PIL.ImageDraw.Draw(mask)
         drawing_layer.rectangle(region, fill=255)
-        return PIL.ImageStat.Stat(image_l, mask=mask).mean
+        return PIL.ImageStat.Stat(image_l, mask=mask).mean[0]
 
 
 class Watermarker(object):
     """An object to add watermarks to images"""
     def __init__(self, watermark, inverter):
+        """ Create a watermarker object.
+
+        watermark: (PIL.Image) The watermark to add to images.
+
+        inverter: (ShouldInvertAlgorithm) The algorithm which determines if the watermark should be inverted.
+        """
         super(Watermarker, self).__init__()
         self.watermark = watermark
         self.inverter = inverter
 
     def add_watermark(self, image, location, proportion=0.015, border_padding=0.02):
+        """ Adds a watermark to an image.
+
+        image: (PIL.Image) The image to add a watermark to.
+
+        location: (str) The location of the watermark. Either top_left, top_right, bottom_left, bottom_right, or bottom_center.
+
+        proportion: (float) The proportion of the watermark area to the image area.
+
+        border_padding: (float) The proportion of padding to add around the border of the image.
+
+        Returns an image with a watermark. (PIL.Image)
+
+        """
         (width, height) = self.watermark.size
 
         # Resize the logo
