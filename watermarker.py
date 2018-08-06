@@ -8,18 +8,50 @@ import argparse
 
 class ShouldInvertAlgorithm(object):
     def should_invert(self, image, region):
+        """ Determines if the watermark should be inverted (assuming watermark is black).
+
+        image: (PIL.Image) The image the watermark will be on.
+
+        region: (array) The region in which the watermark will be placed, in the form [(x0, y0), (x1, y1)] or [x0, y0, x1, y1]
+
+        Returns True if the logo should be inverted, False otherwise. (Bool)
+        """
         pass
 
 class AlwaysInvert(ShouldInvertAlgorithm):
     def should_invert(self, image, region):
+        """ Always returns True, meaning the watermark should always be inverted.
+
+        image: (PIL.Image) Not used.
+
+        region: (array) Not used.
+
+        Returns True
+        """
         return True
 
 class NeverInvert(ShouldInvertAlgorithm):
     def should_invert(self, image, region):
+        """ Always returns False, meaning the watermark should never be inverted.
+
+        image: (PIL.Image) Not used.
+
+        region: (array) Not used.
+
+        Returns False
+        """
         return False
 
 class AutoInvert(ShouldInvertAlgorithm):
     def should_invert(self, image, region):
+        """ Automatically determines if the watermark should be inverted (assuming watermark is black).
+
+        image: (PIL.Image) The image the watermark will be on.
+
+        region: (array) The region in which the watermark will be placed, in the form [(x0, y0), (x1, y1)] or [x0, y0, x1, y1]
+
+        Returns True if the logo should be inverted, False otherwise. (Bool)
+        """
         l1 = self.__get_luminance(image, region) / 255.0
 
         return l1 <= 0.5
