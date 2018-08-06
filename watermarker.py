@@ -102,14 +102,13 @@ class Watermarker(object):
 
         image: (PIL.Image) The image to add a watermark to.
 
-        location: (str) The location of the watermark. Either top_left, top_right, bottom_left, bottom_right, or bottom_center.
+        location: (str) The location of the watermark. Either auto, top_left, top_right, bottom_left, bottom_right, or bottom_center.
 
         proportion: (float) The proportion of the watermark area to the image area.
 
         border_padding: (float) The proportion of padding to add around the border of the image.
 
         Returns an image with a watermark. (PIL.Image)
-
         """
         (width, height) = self.watermark.size
 
@@ -148,6 +147,18 @@ class Watermarker(object):
         return image
 
 def find_best_location(image, logo_width, logo_height, border_padding):
+    """ Find the best location for the watermark.
+
+    image: (PIL.Image) The image to add a watermark to.
+
+    logo_width: (float) The width of the watermark.
+
+    logo_height: (float) The height of the watermark.
+
+    border_padding: (float) The proportion of padding to add around the border of the image.
+
+    Returns the best location for the watermark. Either top_left, top_right, bottom_left, bottom_right, or bottom_center.
+    """
     bl_padding = tuple(map(lambda x: int(x), [border_padding * image.size[0], image.size[1] - logo_height - border_padding * image.size[1]]))
     br_padding = tuple(map(lambda x: int(x), [image.size[0] - logo_width - border_padding * image.size[0], image.size[1] - logo_height - border_padding * image.size[1]]))
     tl_padding = tuple(map(lambda x: int(x), [border_padding * image.size[0], border_padding * image.size[0]]))
@@ -256,7 +267,7 @@ def manipulate_image(current_image, watermarker, corner, resize_amt):
 
     watermarker: (Watermarker) The watermarker, which will add a watermark to an image.
 
-    corner: (str) The location of the watermark on the image. Either top_left, top_right, bottom_left, bottom_right, or bottom_center.
+    corner: (str) The location of the watermark on the image. Either auto, top_left, top_right, bottom_left, bottom_right, or bottom_center.
 
     resize_amt: (float) The amount to scale the image to, as a percent.
 
