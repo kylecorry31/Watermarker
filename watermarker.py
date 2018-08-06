@@ -87,6 +87,14 @@ class Watermarker(object):
 
 # Image helpers
 def resize_image(image, percent):
+    """ Resize an image to a scale amount.
+
+    image: (PIL.Image) The image to scale.
+
+    percent: (float) The percentage of the original size to scale to.
+
+    Returns the scaled image.
+    """
     if percent == 100:
         return image
     prop = percent / 100.0
@@ -94,6 +102,12 @@ def resize_image(image, percent):
     return image.resize( (int(width * prop), int(height * prop)) )
 
 def invert_rgba(image):
+    """ Invert the RGB values of an RGBA image.
+
+    image: (PIL.Image) The image to invert as type RGBA.
+
+    Returns the inverted RGBA image.
+    """
     r, g, b, a = image.split()
     r, g, b = map(lambda i: i.point(lambda p: 255 - p), (r, g, b))
     return PIL.Image.merge(image.mode, (r, g, b, a))
