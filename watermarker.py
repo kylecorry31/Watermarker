@@ -127,6 +127,9 @@ class Watermarker(object):
 
         watermark_mod = self.watermark.resize((width, height))
 
+        if location == "auto":
+            location = find_best_location(image, width, height, border_padding)
+
         # Calculate watermark padding / positioning based on corner
         if location == "bottom-left":
             padding = tuple(map(lambda x: int(x), [border_padding * image.size[0], image.size[1] - height - border_padding * image.size[1]]))
@@ -143,6 +146,25 @@ class Watermarker(object):
             watermark_mod = invert_rgba(watermark_mod)
         image.paste(watermark_mod, padding, mask=watermark_mod)
         return image
+
+def find_best_location(image, logo_width, logo_height, border_padding):
+    bl_padding = tuple(map(lambda x: int(x), [border_padding * image.size[0], image.size[1] - logo_height - border_padding * image.size[1]]))
+    br_padding = tuple(map(lambda x: int(x), [image.size[0] - logo_width - border_padding * image.size[0], image.size[1] - logo_height - border_padding * image.size[1]]))
+    tl_padding = tuple(map(lambda x: int(x), [border_padding * image.size[0], border_padding * image.size[0]]))
+    tr_padding = tuple(map(lambda x: int(x), [image.size[0] - logo_width - border_padding * image.size[0], border_padding * image.size[1]]))
+    bc_padding = tuple(map(lambda x: int(x), [image.size[0]/2 - logo_width/2, image.size[1] - logo_height - border_padding * image.size[1]]))
+
+    paddings = [bl_padding, br_padding, tl_padding, tr_padding, bc_padding]
+
+    vars = list(map(lambda padding: get_luminance_variance(image, [padding, (padding[0] + logo_width, padding[1] + logo_height)]), paddings))
+
+    minimum = min(vars)
+
+    index = vars.index(minimum)
+
+    locations = ["bottom-left", "bottom-right", "top-left", "top-right", "bottom-center"]
+
+    return locations[index]
 
 # Image helpers
 def resize_image(image, percent):
@@ -185,6 +207,22 @@ def set_opacity(image, alpha):
     r, g, b, a = alpha_image.split()
     a = a.point(lambda p: int(255 * alpha) if p else 0)
     return PIL.Image.merge(alpha_image.mode, (r, g, b, a))
+
+def get_luminance_variance(image, region):
+    """ Get the variance of luminance of the region.
+
+    image: (PIL.Image) The image to get the luminance of.
+
+    region: (array) The region to get the luminance of, in the form [(x0, y0), (x1, y1)] or [x0, y0, x1, y1]
+
+    Returns the variance of the luminance of the region. (float)
+    """
+    image_l = image.convert("L")
+    (width, height) = image_l.size
+    mask = PIL.Image.new('L', (width, height), 0)
+    drawing_layer = PIL.ImageDraw.Draw(mask)
+    drawing_layer.rectangle(region, fill=255)
+    return PIL.ImageStat.Stat(image_l, mask=mask).var[0]
 
 
 def get_images(directory=None):
@@ -285,8 +323,8 @@ if __name__ == "__main__":
     parser.add_argument("output", help="The output image directory.", type=str)
     parser.add_argument("watermark", help="The watermark to put on images.", type=str)
     parser.add_argument("--resize", "-r", help="The percent to scale the image to.", type=float, default=100)
-    parser.add_argument("--location", "-l", help="The location of the watermark. Defaults to bottom-center.", type=str,
-                        choices=["top-left", "top-right", "bottom-left", "bottom-right", "bottom-center"], default="bottom-center")
+    parser.add_argument("--location", "-l", help="The location of the watermark. Defaults to auto.", type=str,
+                        choices=["top-left", "top-right", "bottom-left", "bottom-right", "bottom-center", "auto"], default="auto")
     parser.add_argument("--inverted", "-i", help="Choose whether the watermark is inverted. Defaults to auto.", type=str,
                         choices=["inverted", "not-inverted", "auto"], default="auto")
     parser.add_argument("--opacity", "-o", help="Sets the opacity alpha of the watermark, between 0 and 1 inclusive. Defaults to no change.", type=float, default=None)
