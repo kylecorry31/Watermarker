@@ -154,18 +154,29 @@ def manipulate_image(current_image, watermarker, corner, resize_amt):
     return current_image
 
 def main(input_dir, output_dir, watermark, corner, resize_amt, inverted):
-    """ The main function of the program. It is used to get the client's preferences and manipulate each image in the images directory.
+    """ The main function of the program, doing what the program is specified to do.
+
+        input_dir: (str) The input directory, containing images.
+
+        output_dir: (str) The ouput directory to put the modified images in. Does not need to exist.
+
+        watermark: (str) The path of the watermark file.
+
+        corner: (str) The location of the watermark on the image. Either top_left, top_right, bottom_left, bottom_right, or bottom_center.
+
+        resize_amt: (float) The amount to scale the image to, as a percent.
+
+        inverted: (str) The inversion algorithm as a str. Either auto, inverted, or not-inverted.
     """
 
     # Create output directory
-    new_directory = os.path.join(os.getcwd(), output_dir)
     try:
-        os.mkdir(new_directory)
+        os.mkdir(output_dir)
     except OSError:
         pass # if the directory already exists, proceed
 
     images = get_images(input_dir)
-    logo = PIL.Image.open(os.path.join(os.getcwd(), watermark))
+    logo = PIL.Image.open(watermark).convert("RGBA")
 
     inverter = AutoInvert()
 
