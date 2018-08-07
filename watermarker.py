@@ -235,7 +235,7 @@ def get_luminance_variance(image, region):
     mask = PIL.Image.new('L', (width, height), 0)
     drawing_layer = PIL.ImageDraw.Draw(mask)
     drawing_layer.rectangle(region, fill=255)
-    return PIL.ImageStat.Stat(image_l, mask=mask).var[0]
+    return PIL.ImageStat.Stat(image_l, mask=mask).stddev[0]
 
 
 def get_images(directory=None):
