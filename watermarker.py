@@ -86,7 +86,7 @@ class AutoInvert(ShouldInvertAlgorithm):
 
 class Watermarker(object):
     """An object to add watermarks to images"""
-    def __init__(self, watermark, inverter):
+    def __init__(self, watermark, inverter, proportion):
         """ Create a watermarker object.
 
         watermark: (PIL.Image) The watermark to add to images.
@@ -96,15 +96,14 @@ class Watermarker(object):
         super(Watermarker, self).__init__()
         self.watermark = watermark
         self.inverter = inverter
+        self.proportion = proportion
 
-    def add_watermark(self, image, location, proportion=0.015, border_padding=0.02):
+    def add_watermark(self, image, location, border_padding=0.02):
         """ Adds a watermark to an image.
 
         image: (PIL.Image) The image to add a watermark to.
 
         location: (str) The location of the watermark. Either auto, top_left, top_right, bottom_left, bottom_right, or bottom_center.
-
-        proportion: (float) The proportion of the watermark area to the image area.
 
         border_padding: (float) The proportion of padding to add around the border of the image.
 
@@ -119,7 +118,7 @@ class Watermarker(object):
         image_max = max(image.size)
 
         image_area = image.size[0] * image.size[1]
-        watermark_area = int(proportion * image_area)
+        watermark_area = int(self.proportion * image_area)
 
         width = int(math.sqrt(watermark_area / watermark_aspect_ratio))
         height = int(width * watermark_aspect_ratio)
@@ -279,7 +278,7 @@ def manipulate_image(current_image, watermarker, corner, resize_amt):
     current_image = watermarker.add_watermark(current_image, corner)
     return current_image
 
-def main(input_dir, output_dir, watermark, corner, resize_amt, inverted, opacity):
+def main(input_dir, output_dir, watermark, corner, resize_amt, inverted, opacity, proportion):
     """ The main function of the program, doing what the program is specified to do.
 
         input_dir: (str) The input directory, containing images.
@@ -295,6 +294,8 @@ def main(input_dir, output_dir, watermark, corner, resize_amt, inverted, opacity
         inverted: (str) The inversion algorithm as a str. Either auto, inverted, or not-inverted.
 
         opacity: (float) The opacity alpha of the watermark, None means no change.
+
+        proportion: (float) The proportion to scale the watermark to.
     """
 
     # Create output directory
@@ -317,7 +318,7 @@ def main(input_dir, output_dir, watermark, corner, resize_amt, inverted, opacity
     elif inverted == "not-inverted":
         inverter = NeverInvert();
 
-    watermarker = Watermarker(logo, inverter)
+    watermarker = Watermarker(logo, inverter, proportion)
     for n in range(len(images[0])):
         current_image = images[0][n]
         current_filename = images[1][n]
@@ -341,6 +342,7 @@ if __name__ == "__main__":
     parser.add_argument("--inverted", "-i", help="Choose whether the watermark is inverted. Defaults to auto.", type=str,
                         choices=["inverted", "not-inverted", "auto"], default="auto")
     parser.add_argument("--opacity", "-o", help="Sets the opacity alpha of the watermark, between 0 and 1 inclusive. Defaults to no change.", type=float, default=None)
+    parser.add_argument("--proportion", "-p", help="The proportion of the image area from 0 to 1 to scale the watermark to. Defaults to 0.015.", type=float, default=0.015)
     args = parser.parse_args()
 
-    main(args.input, args.output, args.watermark, args.location, args.resize, args.inverted, args.opacity)
+    main(args.input, args.output, args.watermark, args.location, args.resize, args.inverted, args.opacity, args.proportion)
