@@ -322,12 +322,12 @@ def main(input_dir, output_dir, watermark, corner, resize_amt, inverted, opacity
     for n in range(len(images[0])):
         current_image = images[0][n]
         current_filename = images[1][n]
-        print "Processing image:", current_filename, "(" + str(n + 1) + "/" + str(len(images[0]))+ ")"
+        print("Processing image:", current_filename, "(" + str(n + 1) + "/" + str(len(images[0]))+ ")")
         current_image = manipulate_image(current_image, watermarker, corner, resize_amt)
         try:
             current_image.save(os.path.join(output_dir, current_filename), 'JPEG')
         except Exception as e:
-            print "Could not write image:", current_filename
+            print("Could not write image:", current_filename)
 
 
 if __name__ == "__main__":
