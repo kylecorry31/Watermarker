@@ -304,7 +304,7 @@ def main(input_dir, output_dir, watermark, corner, resize_amt, inverted, opacity
     except OSError:
         pass # if the directory already exists, proceed
 
-    images = get_images(input_dir)
+
     logo = PIL.Image.open(watermark).convert("RGBA")
     if opacity is not None:
         logo = set_opacity(logo, min(1, max(0, opacity)))
@@ -319,16 +319,25 @@ def main(input_dir, output_dir, watermark, corner, resize_amt, inverted, opacity
         inverter = NeverInvert();
 
     watermarker = Watermarker(logo, inverter, proportion)
-    for n in range(len(images[0])):
-        current_image = images[0][n]
-        current_filename = images[1][n]
-        print "Processing image:", current_filename, "(" + str(n + 1) + "/" + str(len(images[0]))+ ")"
-        current_image = manipulate_image(current_image, watermarker, corner, resize_amt)
-        try:
-            current_image.save(os.path.join(output_dir, current_filename), 'JPEG')
-        except Exception as e:
-            print "Could not write image:", current_filename
 
+    directory_list = os.listdir(input_dir)
+
+    for n in range(len(directory_list)):
+        entry = directory_list[n]
+        absolute_filename = os.path.join(input_dir, entry)
+        try:
+            image = PIL.Image.open(absolute_filename)
+            print("Processing image:", entry, "(" + str(n + 1) + "/" + str(len(directory_list))+ ")")
+            image = manipulate_image(image, watermarker, corner, resize_amt)
+            try:
+                image.save(os.path.join(output_dir, entry), 'JPEG')
+            except Exception as e:
+                print("Could not write image:", current_filename)
+
+            image.close()
+
+        except IOError:
+            pass # do nothing with errors tying to open non-images
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

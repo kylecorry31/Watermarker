@@ -2,7 +2,7 @@
 A python script for adding a watermark to many images at once.
 
 ## Requirements
-* Python 2
+* Python 3
 * Python PIL library (pillow)
 
 ## Installation
